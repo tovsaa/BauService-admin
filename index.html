@@ -1,0 +1,3491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BauService – Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       VARIABLES & RESET
+       ========================================================= */
+    :root {
+      --bg: #0a0a0a;
+      --bg-soft: #111;
+      --card: #161616;
+      --card-hover: #1c1c1c;
+      --border: #232323;
+      --border-strong: #2e2e2e;
+      --gold: #d4a544;
+      --gold-bright: #e6b855;
+      --gold-soft: rgba(212, 165, 68, 0.1);
+      --text: #e8e8e8;
+      --text-muted: #9a9a9a;
+      --text-dim: #6a6a6a;
+      --danger: #cf4747;
+      --success: #4caf78;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    /* =========================================================
+       LAYOUT
+       ========================================================= */
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(10, 10, 10, 0.92);
+    }
+    .topbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      transition: opacity 200ms ease;
+    }
+    .topbar-brand:hover { opacity: 0.85; }
+    .topbar-brand .logo { display: flex; align-items: center; }
+    .topbar-brand .logo svg {
+      width: 56px;
+      height: auto;
+      display: block;
+    }
+    .topbar-brand .label {
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      padding: 4px 10px;
+      border: 1px solid rgba(212, 165, 68, 0.35);
+      border-radius: 3px;
+    }
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .topbar-user .email { color: var(--text); }
+
+    main { padding: 48px 0 80px; }
+
+    /* =========================================================
+       LOGIN SCREEN
+       ========================================================= */
+    .login-wrap {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.6);
+    }
+    .login-card h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .login-card .sub {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+    .login-card form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* =========================================================
+       FORMS
+       ========================================================= */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .input, .textarea {
+      width: 100%;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      transition: border-color 200ms ease, background 200ms ease;
+    }
+    .input:focus, .textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: #181818;
+    }
+    .input::placeholder, .textarea::placeholder { color: var(--text-dim); }
+    .textarea {
+      resize: vertical;
+      min-height: 90px;
+      font-family: 'Manrope', sans-serif;
+    }
+
+    /* Two-column grid for short fields */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 540px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+
+    /* Toggle (active checkbox styled) */
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle input { display: none; }
+    .toggle .track {
+      width: 36px; height: 20px;
+      background: var(--border-strong);
+      border-radius: 999px;
+      position: relative;
+      transition: background 200ms ease;
+    }
+    .toggle .track::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: transform 200ms ease;
+    }
+    .toggle input:checked + .track { background: var(--gold); }
+    .toggle input:checked + .track::after { transform: translateX(16px); }
+    .toggle .text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* =========================================================
+       BUTTONS
+       ========================================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: all 200ms ease;
+      background: transparent;
+      color: var(--text);
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #1a1a1a;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--gold-bright);
+    }
+
+    .btn-ghost {
+      border-color: var(--border-strong);
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: rgba(207, 71, 71, 0.4);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(207, 71, 71, 0.1);
+      border-color: var(--danger);
+    }
+
+    .btn-icon {
+      width: 32px; height: 32px;
+      padding: 0;
+      border-radius: var(--radius);
+    }
+
+    .btn-block { width: 100%; }
+    .btn-sm { padding: 7px 14px; font-size: 11px; }
+
+    /* =========================================================
+       MESSAGES (toast / error)
+       ========================================================= */
+    .message {
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      display: none;
+      margin-bottom: 14px;
+      align-items: center;
+      gap: 10px;
+    }
+    .message.visible { display: flex; }
+    .message.error {
+      background: rgba(207, 71, 71, 0.08);
+      border: 1px solid rgba(207, 71, 71, 0.4);
+      color: #f0a8a8;
+    }
+    .message.success {
+      background: rgba(76, 175, 120, 0.08);
+      border: 1px solid rgba(76, 175, 120, 0.4);
+      color: #b5e6c8;
+    }
+    .message .close {
+      margin-left: auto;
+      background: none;
+      border: 0;
+      color: inherit;
+      opacity: 0.6;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .message .close:hover { opacity: 1; }
+
+    /* Auto-dismissing toast in the bottom-right corner */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      background: var(--card);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      font-size: 13px;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 250ms ease, transform 250ms ease;
+      box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+       TAB NAVIGATION (Banner / Projekte)
+       ========================================================= */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-button {
+      background: transparent;
+      border: 0;
+      padding: 14px 22px;
+      margin-bottom: -1px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    .tab-button:hover { color: var(--text); }
+    .tab-button.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .tab-pane.hidden { display: none; }
+
+    /* =========================================================
+       TAG PILLS (project category picker in composer/edit)
+       ========================================================= */
+    .tag-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-pill {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: all 180ms ease;
+    }
+    .tag-pill:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .tag-pill.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #1a1a1a;
+    }
+
+    /* Static tag display (in cards, not interactive) */
+    .tag-badges {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag-badge {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--gold);
+      background: var(--gold-soft);
+      padding: 4px 9px;
+      border-radius: 2px;
+    }
+
+    /* Inline hint under a field */
+    .field-hint {
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* =========================================================
+       PHOTOS GRID (multi-image picker)
+       ========================================================= */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .photo-tile {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-strong);
+    }
+    .photo-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-tile .photo-cover-badge {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: var(--gold);
+      color: #1a1a1a;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 2px;
+    }
+    .photo-tile-actions {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      padding: 6px;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+    .photo-tile:hover .photo-tile-actions,
+    .photo-tile:focus-within .photo-tile-actions {
+      opacity: 1;
+    }
+    .photo-tile-btn {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 150ms ease;
+    }
+    .photo-tile-btn:hover:not(:disabled) {
+      background: var(--gold);
+      color: #1a1a1a;
+      border-color: var(--gold);
+    }
+    .photo-tile-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .photo-tile-btn.danger:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .photo-tile-btn svg { width: 12px; height: 12px; }
+    .photo-tile-btn-group { display: flex; gap: 4px; }
+
+    /* =========================================================
+       PROJECT CARD (in feed)
+       ========================================================= */
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+    .project-card.editing {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 0;
+    }
+    .project-card.inactive { opacity: 0.55; }
+
+    .project-card-cover {
+      aspect-ratio: 4 / 5;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-strong);
+    }
+    .project-card-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .project-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .project-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+    .project-card-meta .display-id {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      font-size: 11px;
+    }
+    .project-card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+      margin: 0;
+    }
+    .project-card-loc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .project-card-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .project-edit-body {
+      padding: 24px;
+    }
+
+    @media (max-width: 700px) {
+      .project-card {
+        grid-template-columns: 80px 1fr;
+        grid-template-rows: auto auto;
+      }
+      .project-card-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+      }
+    }
+
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
+    .page-head {
+      margin-bottom: 32px;
+    }
+    .page-head h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 6px;
+    }
+    .page-head .sub {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* =========================================================
+       COMPOSER (new banner)
+       ========================================================= */
+    .composer {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .composer-tag {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: var(--bg);
+      padding: 0 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .composer-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* =========================================================
+       BANNER PREVIEW (live mock-up of how the banner will look)
+       ========================================================= */
+    .preview-section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .preview-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .preview-label .hint {
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .preview-label .preview-status {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .preview-label .preview-status.inactive {
+      background: rgba(154, 154, 154, 0.12);
+      color: var(--text-muted);
+      border: 1px solid var(--border-strong);
+    }
+    .preview-label .preview-status.expired {
+      background: rgba(207, 71, 71, 0.1);
+      color: #f0a8a8;
+      border: 1px solid rgba(207, 71, 71, 0.3);
+    }
+
+    /* The preview itself — looks like a top notification bar */
+    .banner-preview {
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 52px;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 200ms ease;
+    }
+
+    /* Coloured accent bar on the left edge */
+    .banner-preview::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      transition: background 200ms ease;
+    }
+
+    .banner-preview.inactive { opacity: 0.45; }
+    .banner-preview.inactive::before { background: var(--text-dim); }
+    .banner-preview.expired::before { background: var(--danger); }
+
+    .banner-preview-icon {
+      color: var(--gold);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .banner-preview-icon svg {
+      width: 16px; height: 16px;
+    }
+
+    .banner-preview-text {
+      flex: 1;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.45;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+    .banner-preview-text.empty {
+      color: var(--text-dim);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .banner-preview-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--gold);
+      color: #1a1a1a;
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .banner-preview-cta svg {
+      width: 11px; height: 11px;
+    }
+
+    @media (max-width: 540px) {
+      .banner-preview { flex-wrap: wrap; }
+      .banner-preview-cta { font-size: 10px; padding: 6px 10px; }
+    }
+
+    /* =========================================================
+       IMAGE UPLOAD (drop zone + preview)
+       ========================================================= */
+    .image-upload {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .drop-zone {
+      position: relative;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: var(--bg-soft);
+      cursor: pointer;
+      transition: border-color 200ms ease, background 200ms ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 60px;
+    }
+    .drop-zone:hover {
+      border-color: var(--gold);
+      background: #181818;
+    }
+    .drop-zone.dragover {
+      border-color: var(--gold);
+      background: var(--gold-soft);
+      border-style: solid;
+    }
+
+    .drop-zone-icon {
+      flex-shrink: 0;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+    .drop-zone-icon svg { width: 22px; height: 22px; }
+
+    .drop-zone-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+      text-transform: none;       /* override .field label uppercase */
+      letter-spacing: normal;     /* override .field label letter-spacing */
+      font-family: 'Manrope', sans-serif;
+    }
+    .drop-zone-text .main {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .drop-zone-text .hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+    }
+
+    /* Hidden native file input — clicked via wrapper */
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Image preview thumbnail (after upload) */
+    .image-thumb {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+    }
+    .image-thumb img {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 3px;
+      display: block;
+    }
+    .image-thumb-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+    .image-thumb-info .name {
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+    .image-thumb-info .size {
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+    .image-thumb-remove {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 200ms ease;
+    }
+    .image-thumb-remove:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+    .image-thumb-remove svg { width: 12px; height: 12px; }
+
+    /* Upload progress indicator */
+    .upload-progress {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .upload-progress::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Image inside the banner preview */
+    .banner-preview-image {
+      width: 48px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* Image inside a feed card (compact) */
+    .banner-card-image {
+      max-width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    /* =========================================================
+       BANNERS LIST
+       ========================================================= */
+    .feed-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .feed-head h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .feed-head .count {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* Filter tabs above the list */
+    .feed-filters {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 10px 14px;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 200ms ease, border-color 200ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: -1px; /* overlaps the parent border-bottom for clean active line */
+    }
+
+    .filter-tab:hover { color: var(--text); }
+
+    .filter-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .filter-tab .filter-count {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0;
+      min-width: 18px;
+      text-align: center;
+      transition: all 200ms ease;
+    }
+    .filter-tab.active .filter-count {
+      background: var(--gold-soft);
+      border-color: rgba(212, 165, 68, 0.3);
+      color: var(--gold);
+    }
+    .filter-tab:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .filter-tab:disabled:hover { color: var(--text-muted); }
+
+    @media (max-width: 540px) {
+      .filter-tab { padding: 9px 10px; font-size: 10px; letter-spacing: 0.12em; }
+    }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .banner-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      transition: border-color 200ms ease, background 200ms ease;
+      position: relative;
+    }
+    .banner-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .banner-card .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .badge {
+      padding: 3px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.12em;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .badge.active   { background: rgba(76, 175, 120, 0.15); color: #6ed099; border: 1px solid rgba(76, 175, 120, 0.4); }
+    .badge.inactive { background: rgba(154, 154, 154, 0.1); color: var(--text-muted); border: 1px solid var(--border-strong); }
+    .badge.expired  { background: rgba(207, 71, 71, 0.1); color: #f0a8a8; border: 1px solid rgba(207, 71, 71, 0.3); }
+
+    .banner-card .text {
+      font-size: 16px;
+      color: #fff;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      word-wrap: break-word;
+    }
+
+    .banner-card .cta-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--gold-soft);
+      border: 1px solid rgba(212, 165, 68, 0.3);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .banner-card .cta-preview svg { width: 11px; height: 11px; }
+
+    .banner-card .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .banner-card .actions .spacer { flex: 1; }
+
+    /* Edit form inside card */
+    .banner-card.editing {
+      border-color: var(--gold);
+      background: var(--card-hover);
+    }
+    .edit-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .edit-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Empty state */
+    .feed-empty {
+      text-align: center;
+      padding: 80px 20px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+    }
+    .feed-empty .big {
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .feed-empty .small {
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Mobile */
+    @media (max-width: 540px) {
+      .page-head h1 { font-size: 22px; }
+      .composer { padding: 20px 18px; }
+      .banner-card { padding: 18px; }
+      .topbar-user .email { display: none; }
+    }
+
+    /* Visibility helpers */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ========================= TOPBAR ========================= -->
+  <header class="topbar">
+    <div class="container">
+      <a href="/" class="topbar-brand" aria-label="BauService — zur Startseite">
+        <span class="logo">
+          <svg viewBox="0 0 458 430" fill="#d4a544" xmlns="http://www.w3.org/2000/svg" aria-label="BauService Logo">
+            <g transform="translate(0,430) scale(0.1,-0.1)">
+              <path d="M1512 3360 c-403 -125 -735 -229 -737 -232 -8 -7 82 -68 100 -68 9 0 323 95 698 211 375 116 691 211 702 211 11 0 327 -95 702 -211 375 -116 689 -211 698 -211 26 0 108 63 93 71 -31 16 -1480 459 -1501 458 -12 -1 -352 -104 -755 -229z"/>
+              <path d="M1180 2440 l0 -440 120 0 120 0 0 440 0 440 -120 0 -120 0 0 -440z"/>
+              <path d="M1460 2780 l0 -100 43 0 c60 0 82 -18 82 -70 0 -52 -22 -70 -82 -70 l-43 0 0 -100 0 -100 39 0 c22 0 51 -4 65 -10 23 -8 26 -15 26 -59 0 -59 -14 -71 -84 -71 l-46 0 0 -100 0 -100 104 0 c203 0 270 57 270 230 1 111 -19 154 -87 191 l-48 26 29 12 c67 28 102 95 102 196 0 75 -18 125 -59 166 -46 46 -91 59 -213 59 l-98 0 0 -100z"/>
+              <path d="M2121 2813 c-56 -191 -220 -762 -226 -785 l-7 -28 119 0 120 0 67 263 67 263 -36 140 c-20 76 -41 156 -46 177 -15 57 -35 47 -58 -30z"/>
+              <path d="M2280 2615 l68 -265 -46 0 -47 0 -18 -77 c-9 -43 -20 -88 -23 -100 -6 -22 -4 -22 92 -25 l97 -3 20 -72 19 -73 123 0 123 0 -105 363 c-58 199 -115 396 -127 437 l-22 75 -111 3 -110 3 67 -266z"/>
+              <path d="M2762 2513 c3 -360 3 -369 26 -410 42 -80 121 -112 270 -113 l82 0 0 94 0 94 -56 4 c-40 3 -61 10 -70 23 -11 15 -14 87 -14 347 l0 328 -121 0 -120 0 3 -367z"/>
+              <path d="M3180 2434 l0 -446 43 7 c107 17 168 74 187 174 5 30 10 201 10 382 l0 329 -120 0 -120 0 0 -446z"/>
+              <path d="M760 1365 l0 -455 1530 0 1530 0 -2 453 -3 452 -1527 3 -1528 2 0 -455z m3000 0 l0 -405 -1475 0 -1475 0 0 405 0 405 1475 0 1475 0 0 -405z"/>
+              <path d="M1070 1527 l0 -56 85 -3 85 -3 0 47 c0 26 -3 49 -7 51 -5 3 -43 8 -85 12 l-78 7 0 -55z"/>
+              <path d="M3080 1526 l0 -56 80 0 80 0 0 44 c0 25 -4 47 -9 50 -5 3 -41 9 -80 12 l-71 7 0 -57z"/>
+              <path d="M944 1536 c-32 -32 -34 -37 -34 -106 0 -65 2 -74 28 -100 18 -17 44 -31 68 -35 21 -3 57 -9 79 -13 l40 -7 3 -83 c3 -91 6 -93 67 -68 18 8 41 25 50 39 22 33 30 116 16 159 -18 55 -42 70 -131 82 l-80 10 0 78 0 78 -36 0 c-28 0 -44 -8 -70 -34z"/>
+              <path d="M1350 1345 l0 -225 70 0 70 0 0 225 0 225 -70 0 -70 0 0 -225z"/>
+              <path d="M1510 1520 l0 -50 85 0 85 0 0 50 0 50 -85 0 -85 0 0 -50z"/>
+              <path d="M1770 1345 l0 -225 70 0 70 0 0 225 0 225 -70 0 -70 0 0 -225z"/>
+              <path d="M1930 1521 l0 -50 38 -3 c35 -3 37 -5 40 -42 4 -43 -7 -56 -50 -56 -27 0 -28 -2 -28 -49 0 -38 4 -50 16 -53 10 -2 27 -31 43 -73 l27 -70 72 -3 c40 -2 72 0 72 3 0 4 -14 41 -32 82 -27 66 -29 77 -16 87 8 6 20 21 26 33 15 27 16 167 2 194 -18 33 -64 49 -140 49 l-70 0 0 -49z"/>
+              <path d="M2200 1558 c1 -7 29 -107 64 -223 l63 -210 68 -3 c52 -2 66 0 63 10 -3 7 -31 109 -63 226 l-58 212 -69 0 c-48 0 -68 -4 -68 -12z"/>
+              <path d="M2460 1445 l-33 -125 26 -96 c26 -97 32 -112 43 -102 5 6 134 427 134 441 0 4 -31 7 -69 7 l-68 0 -33 -125z"/>
+              <path d="M2690 1345 l0 -225 70 0 70 0 0 225 0 225 -70 0 -70 0 0 -225z"/>
+              <path d="M2979 1547 c-19 -13 -39 -38 -46 -57 -15 -43 -17 -232 -3 -281 21 -75 95 -105 232 -93 l78 7 0 48 0 49 -80 0 c-68 0 -81 3 -90 19 -6 11 -10 87 -10 175 l0 156 -24 0 c-12 0 -38 -10 -57 -23z"/>
+              <path d="M3320 1345 l0 -225 70 0 70 0 0 225 0 225 -70 0 -70 0 0 -225z"/>
+              <path d="M3480 1520 l0 -50 90 0 90 0 0 50 0 50 -90 0 -90 0 0 -50z"/>
+              <path d="M1510 1350 l0 -50 70 0 70 0 0 50 0 50 -70 0 -70 0 0 -50z"/>
+              <path d="M3480 1350 l0 -50 75 0 75 0 0 50 0 50 -75 0 -75 0 0 -50z"/>
+              <path d="M920 1171 l0 -48 68 -6 c128 -13 122 -15 122 48 l0 55 -95 0 -95 0 0 -49z"/>
+              <path d="M1510 1170 l0 -50 85 0 85 0 0 50 0 50 -85 0 -85 0 0 -50z"/>
+              <path d="M3480 1170 l0 -50 90 0 90 0 0 50 0 50 -90 0 -90 0 0 -50z"/>
+            </g>
+          </svg>
+        </span>
+        <span class="label">Admin</span>
+      </a>
+
+      <div class="topbar-user hidden" id="topbarUser">
+        <span class="email" id="userEmail"></span>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================= LOGIN SCREEN ========================= -->
+  <section id="loginScreen">
+    <div class="login-wrap">
+      <div class="login-card">
+        <h1>Anmelden</h1>
+        <p class="sub">Banner verwalten</p>
+
+        <div class="message error" id="loginError">
+          <span id="loginErrorText"></span>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label for="loginEmail">E-Mail</label>
+            <input type="email" id="loginEmail" class="input" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Passwort</label>
+            <input type="password" id="loginPassword" class="input" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Anmelden</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= ADMIN SCREEN ========================= -->
+  <main id="adminScreen" class="hidden">
+    <div class="container">
+
+      <!-- Tab navigation between admin sections.
+           Active tab is persisted in localStorage so a refresh keeps the user
+           where they were. Clicking switches the visible tab-pane. -->
+      <nav class="tab-nav" id="adminTabs">
+        <button class="tab-button active" data-tab="banner">
+          <span>Banner</span>
+        </button>
+        <button class="tab-button" data-tab="projekte">
+          <span>Projekte</span>
+        </button>
+      </nav>
+
+      <!-- ============== TAB: BANNER ============== -->
+      <section id="tabBanner" class="tab-pane active">
+
+        <div class="page-head">
+          <h1>Banner</h1>
+          <p class="sub">Aktuelle Hinweise und Aktionen, die auf der Website angezeigt werden.</p>
+        </div>
+
+      <!-- Persistent error/success banner -->
+      <div class="message error" id="apiError">
+        <span id="apiErrorText"></span>
+        <button class="close" id="apiErrorClose">×</button>
+      </div>
+
+      <!-- ========== COMPOSER ========== -->
+      <section class="composer">
+        <span class="composer-tag">Neuer Banner</span>
+        <div class="composer-fields">
+          <div class="field">
+            <label for="newText">Text</label>
+            <textarea id="newText" class="textarea" placeholder="z. B. Wir feiern 3 Jahre BauService!" maxlength="240"></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="newUntil">Anzeigen bis (optional)</label>
+              <input type="date" id="newUntil" class="input" />
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <label class="toggle">
+                <input type="checkbox" id="newActive" checked />
+                <span class="track"></span>
+                <span class="text">Sofort aktiv</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="newCtaLabel">Button-Text (optional)</label>
+              <input type="text" id="newCtaLabel" class="input" placeholder="z. B. Anfragen" maxlength="40" />
+            </div>
+            <div class="field">
+              <label for="newCtaHref">Button-Link (optional)</label>
+              <input type="text" id="newCtaHref" class="input" placeholder="#kontakt oder https://…" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Bild (optional)</label>
+            <div class="image-upload" id="newImageUpload">
+              <!-- Drop zone (visible when no image) -->
+              <label class="drop-zone" id="newDropZone">
+                <span class="drop-zone-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </span>
+                <span class="drop-zone-text">
+                  <span class="main">Bild hochladen oder hierhin ziehen</span>
+                  <span class="hint">JPG, PNG oder WebP · wird automatisch komprimiert</span>
+                </span>
+                <input type="file" id="newImageInput" accept="image/jpeg,image/png,image/webp" />
+              </label>
+
+              <!-- Thumbnail preview (visible when image is uploaded) -->
+              <div class="image-thumb hidden" id="newImageThumb">
+                <img alt="" id="newImageThumbImg" />
+                <div class="image-thumb-info">
+                  <span class="name" id="newImageThumbName">image.jpg</span>
+                  <span class="size" id="newImageThumbSize">—</span>
+                </div>
+                <button type="button" class="image-thumb-remove" id="newImageRemove" title="Bild entfernen">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Progress indicator (visible during upload) -->
+              <div class="upload-progress hidden" id="newImageProgress">
+                <span id="newImageProgressText">Bild wird hochgeladen…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live preview — how the banner will look on the website -->
+        <div class="preview-section">
+          <div class="preview-label">
+            <span>Vorschau</span>
+            <span class="hint">So wird der Banner auf der Webseite angezeigt</span>
+            <span class="preview-status hidden" data-preview-status></span>
+          </div>
+          <div class="banner-preview" id="newPreview">
+            <span class="banner-preview-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </span>
+            <span class="banner-preview-text empty" data-preview-text>Hier erscheint Ihre Vorschau</span>
+            <a class="banner-preview-cta hidden" data-preview-cta>
+              <span data-preview-cta-label></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="composer-actions">
+          <span id="charCount" class="meta" style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dim);">0 / 240 Zeichen</span>
+          <button class="btn btn-primary" id="publishBtn" disabled>Veröffentlichen</button>
+        </div>
+      </section>
+
+      <!-- ========== FEED ========== -->
+      <div class="feed-head">
+        <h2>Bestehende Banner</h2>
+      </div>
+
+      <div class="feed-filters" id="feedFilters">
+        <button class="filter-tab active" data-filter="all">
+          Alle <span class="filter-count" data-count="all">0</span>
+        </button>
+        <button class="filter-tab" data-filter="active">
+          Aktiv <span class="filter-count" data-count="active">0</span>
+        </button>
+        <button class="filter-tab" data-filter="expired">
+          Abgelaufen <span class="filter-count" data-count="expired">0</span>
+        </button>
+        <button class="filter-tab" data-filter="inactive">
+          Inaktiv <span class="filter-count" data-count="inactive">0</span>
+        </button>
+      </div>
+
+      <div id="feedContainer">
+        <div class="loading" id="loadingState">Wird geladen…</div>
+      </div>
+
+      </section>
+      <!-- ============== /TAB: BANNER ============== -->
+
+
+      <!-- ============== TAB: PROJEKTE ============== -->
+      <section id="tabProjekte" class="tab-pane hidden">
+
+        <div class="page-head">
+          <h1>Projekte</h1>
+          <p class="sub">Portfolio-Einträge auf der Website. Reihenfolge, Bilder, Kategorien.</p>
+        </div>
+
+        <!-- Persistent error/success for project actions -->
+        <div class="message error" id="projApiError">
+          <span id="projApiErrorText"></span>
+          <button class="close" id="projApiErrorClose">×</button>
+        </div>
+
+        <!-- ========== COMPOSER (new project) ========== -->
+        <section class="composer">
+          <span class="composer-tag">Neues Projekt</span>
+          <div class="composer-fields">
+
+            <div class="field-row">
+              <div class="field" style="max-width:140px">
+                <label for="projNewDisplayId">Nummer</label>
+                <input type="text" id="projNewDisplayId" class="input" placeholder="z. B. 18" maxlength="6" />
+              </div>
+              <div class="field">
+                <label for="projNewTitle">Titel</label>
+                <input type="text" id="projNewTitle" class="input" placeholder="z. B. Neue Innentüren mit weißer Zarge" maxlength="120" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="projNewLocation">Ort</label>
+                <input type="text" id="projNewLocation" class="input" placeholder="z. B. Eschwege" maxlength="60" />
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <label class="toggle">
+                  <input type="checkbox" id="projNewActive" checked />
+                  <span class="track"></span>
+                  <span class="text">Auf der Website sichtbar</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Kategorien</label>
+              <div class="tag-pills" id="projNewTags">
+                <button type="button" class="tag-pill" data-tag="fenster">Fenster</button>
+                <button type="button" class="tag-pill" data-tag="innentueren">Innentüren</button>
+                <button type="button" class="tag-pill" data-tag="aussentueren">Außentüren</button>
+                <button type="button" class="tag-pill" data-tag="bodenverlegung">Bodenverlegung</button>
+              </div>
+              <span class="field-hint">Mindestens eine wählen. Mehrfachauswahl möglich (z. B. Außentüren + Fenster).</span>
+            </div>
+
+            <div class="field">
+              <label for="projNewDescription">Beschreibung</label>
+              <textarea id="projNewDescription" class="textarea" placeholder="Kurze Beschreibung der Arbeit, Materialien, Besonderheiten…" maxlength="800" rows="4"></textarea>
+              <span class="field-hint"><span id="projNewDescCount">0</span> / 800 Zeichen</span>
+            </div>
+
+            <div class="field">
+              <label>Bilder</label>
+              <div class="image-upload">
+                <label class="drop-zone" id="projNewDropZone">
+                  <span class="drop-zone-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                  </span>
+                  <span class="drop-zone-text">
+                    <span class="main">Bilder hochladen oder hierhin ziehen</span>
+                    <span class="hint">Mehrere Dateien gleichzeitig möglich · JPG, PNG oder WebP · automatisch komprimiert</span>
+                  </span>
+                  <input type="file" id="projNewImageInput" accept="image/jpeg,image/png,image/webp" multiple />
+                </label>
+                <div class="upload-progress hidden" id="projNewImageProgress">
+                  <span id="projNewImageProgressText">Bild wird hochgeladen…</span>
+                </div>
+                <!-- Grid of uploaded photos with reorder/remove controls -->
+                <div class="photos-grid hidden" id="projNewPhotosGrid"></div>
+                <span class="field-hint" id="projNewPhotosHint" style="display:none">Das erste Bild wird als Deckbild verwendet. Reihenfolge mit den Pfeilen ändern.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="composer-actions">
+            <span class="meta" style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dim);">Pflichtfelder: Nummer, Titel, Ort, mind. 1 Kategorie, mind. 1 Bild</span>
+            <button class="btn btn-primary" id="projPublishBtn" disabled>Veröffentlichen</button>
+          </div>
+        </section>
+
+        <!-- ========== FEED ========== -->
+        <div class="feed-head">
+          <h2>Bestehende Projekte</h2>
+        </div>
+
+        <div class="feed-filters" id="projFeedFilters">
+          <button class="filter-tab active" data-proj-filter="all">
+            Alle <span class="filter-count" data-proj-count="all">0</span>
+          </button>
+          <button class="filter-tab" data-proj-filter="fenster">
+            Fenster <span class="filter-count" data-proj-count="fenster">0</span>
+          </button>
+          <button class="filter-tab" data-proj-filter="innentueren">
+            Innentüren <span class="filter-count" data-proj-count="innentueren">0</span>
+          </button>
+          <button class="filter-tab" data-proj-filter="aussentueren">
+            Außentüren <span class="filter-count" data-proj-count="aussentueren">0</span>
+          </button>
+          <button class="filter-tab" data-proj-filter="bodenverlegung">
+            Bodenverlegung <span class="filter-count" data-proj-count="bodenverlegung">0</span>
+          </button>
+          <button class="filter-tab" data-proj-filter="inactive">
+            Versteckt <span class="filter-count" data-proj-count="inactive">0</span>
+          </button>
+        </div>
+
+        <div id="projFeedContainer">
+          <div class="loading" id="projLoadingState">Wird geladen…</div>
+        </div>
+
+      </section>
+      <!-- ============== /TAB: PROJEKTE ============== -->
+
+    </div>
+  </main>
+
+  <!-- ========================= TOAST ========================= -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ========================= SCRIPT ========================= -->
+  <script>
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const SUPABASE_URL = "https://oevqnbgqxlczpyawdchw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_TXtwa82-CZchdpxxKblOqg_49pHSa-6";
+
+    // localStorage keys
+    const LS_SESSION = "bauservice_admin_session";
+    const LS_FILTER  = "bauservice_admin_filter";
+    const LS_TAB     = "bauservice_admin_tab";
+    const LS_PROJ_FILTER = "bauservice_admin_proj_filter";
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    const state = {
+      session: null,      // { access_token, refresh_token, expires_at, user: { email } }
+      activeTab: localStorage.getItem(LS_TAB) || "banner", // banner | projekte
+
+      // Banner state
+      banners: [],
+      editingId: null,
+      filter: localStorage.getItem(LS_FILTER) || "all", // all | active | expired | inactive
+      composerImageUrl: null,
+      editImageUrls: {},
+
+      // Project state
+      projects: [],
+      editingProjectId: null,
+      projFilter: localStorage.getItem(LS_PROJ_FILTER) || "all",
+      // Composer (new project) — staged data before publish
+      projComposer: {
+        photos: [],          // [{ url, thumb_url }]
+        tags: new Set(),     // active category tags
+      },
+      // Per-project edit state (uncommitted edits)
+      projEditPhotos: {},    // { [projectId]: [{url, thumb_url}, ...] }
+      projEditTags:   {},    // { [projectId]: Set<string> }
+    };
+
+    // ============================================================
+    // SESSION HELPERS
+    // ============================================================
+    function saveSession(s) {
+      localStorage.setItem(LS_SESSION, JSON.stringify(s));
+      state.session = s;
+    }
+    function clearSession() {
+      localStorage.removeItem(LS_SESSION);
+      state.session = null;
+    }
+
+    /**
+     * Restore a session from localStorage.
+     * If access_token is still valid — return it as-is.
+     * If it's about to expire (or already has) — try to refresh via refresh_token.
+     * If refresh fails too — clear and return null (force re-login).
+     */
+    async function initSession() {
+      let s;
+      try {
+        const raw = localStorage.getItem(LS_SESSION);
+        if (!raw) return null;
+        s = JSON.parse(raw);
+      } catch {
+        clearSession();
+        return null;
+      }
+      // Valid for at least 60 seconds — use as-is
+      const expiresMs = (s.expires_at || 0) * 1000;
+      if (expiresMs > Date.now() + 60_000) {
+        return s;
+      }
+      // Need to refresh
+      if (!s.refresh_token) {
+        clearSession();
+        return null;
+      }
+      try {
+        const refreshed = await apiRefreshToken(s.refresh_token);
+        saveSession(refreshed);
+        return refreshed;
+      } catch (err) {
+        // Refresh token itself is invalid/expired — force re-login
+        console.warn("Session refresh failed:", err);
+        clearSession();
+        return null;
+      }
+    }
+
+    /**
+     * Called before every authenticated API request.
+     * Ensures the access_token is valid for at least the next 60 seconds;
+     * refreshes it pre-emptively if not. Returns true if session is usable.
+     */
+    async function ensureValidSession() {
+      if (!state.session) return false;
+      const expiresMs = (state.session.expires_at || 0) * 1000;
+      if (expiresMs > Date.now() + 60_000) return true;
+
+      if (!state.session.refresh_token) {
+        clearSession();
+        renderAuth();
+        return false;
+      }
+      try {
+        const refreshed = await apiRefreshToken(state.session.refresh_token);
+        saveSession(refreshed);
+        return true;
+      } catch (err) {
+        console.warn("Token refresh failed:", err);
+        clearSession();
+        renderAuth();
+        showLoginError("Sitzung abgelaufen. Bitte erneut anmelden.");
+        return false;
+      }
+    }
+
+    // ============================================================
+    // API CLIENT
+    // ============================================================
+    function authHeaders() {
+      const h = {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json",
+      };
+      if (state.session?.access_token) {
+        h["Authorization"] = `Bearer ${state.session.access_token}`;
+      }
+      return h;
+    }
+
+    async function apiLogin(email, password) {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error_description || data.msg || data.message || "Anmeldung fehlgeschlagen.");
+      }
+      // Supabase returns access_token, refresh_token, expires_at, user, ...
+      return {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: data.expires_at,
+        user: { email: data.user?.email || email },
+      };
+    }
+
+    /**
+     * Exchange a refresh_token for a fresh access_token (and a rotated refresh_token).
+     * Note: Supabase rotates refresh tokens — the old one becomes invalid after use.
+     */
+    async function apiRefreshToken(refreshToken) {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error_description || data.msg || data.message || "Refresh failed.");
+      }
+      return {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: data.expires_at,
+        user: { email: data.user?.email || state.session?.user?.email || "" },
+      };
+    }
+
+    async function apiLogout() {
+      // Best-effort logout call (won't block UI on failure)
+      try {
+        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+          method: "POST",
+          headers: authHeaders(),
+        });
+      } catch {/* ignore */}
+    }
+
+    async function apiList() {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/banners?select=*&order=created_at.desc`,
+        { headers: authHeaders() }
+      );
+      if (!res.ok) throw new Error(`Liste konnte nicht geladen werden (${res.status}): ${await res.text()}`);
+      return res.json();
+    }
+
+    async function apiCreate(payload) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/banners`, {
+        method: "POST",
+        headers: { ...authHeaders(), Prefer: "return=representation" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht angelegt werden (${res.status}): ${await res.text()}`);
+      const arr = await res.json();
+      return arr[0];
+    }
+
+    async function apiUpdate(id, payload) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?id=eq.${id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders(), Prefer: "return=representation" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht gespeichert werden (${res.status}): ${await res.text()}`);
+      const arr = await res.json();
+      return arr[0];
+    }
+
+    async function apiDelete(id) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/banners?id=eq.${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht gelöscht werden (${res.status}): ${await res.text()}`);
+    }
+
+    // ============================================================
+    // RENDER HELPERS
+    // ============================================================
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      const day = String(d.getDate()).padStart(2, "0");
+      const mon = String(d.getMonth() + 1).padStart(2, "0");
+      return `${day}.${mon}.${d.getFullYear()}`;
+    }
+
+    // Compute display status
+    function bannerStatus(b) {
+      if (!b.active) return { kind: "inactive", label: "inaktiv" };
+      if (b.until_date) {
+        const until = new Date(b.until_date + "T23:59:59");
+        if (until < new Date()) return { kind: "expired", label: "abgelaufen" };
+      }
+      return { kind: "active", label: "aktiv" };
+    }
+
+    function renderToast(text) {
+      const t = document.getElementById("toast");
+      t.textContent = text;
+      t.classList.add("visible");
+      clearTimeout(renderToast._tid);
+      renderToast._tid = setTimeout(() => t.classList.remove("visible"), 2200);
+    }
+
+    function showApiError(msg) {
+      const el = document.getElementById("apiError");
+      document.getElementById("apiErrorText").textContent = msg;
+      el.classList.add("visible");
+    }
+    function hideApiError() {
+      document.getElementById("apiError").classList.remove("visible");
+    }
+
+    function showLoginError(msg) {
+      const el = document.getElementById("loginError");
+      document.getElementById("loginErrorText").textContent = msg;
+      el.classList.add("visible");
+    }
+    function hideLoginError() {
+      document.getElementById("loginError").classList.remove("visible");
+    }
+
+    // ============================================================
+    // RENDER: AUTH
+    // ============================================================
+    function renderAuth() {
+      const loggedIn = !!state.session;
+      document.getElementById("loginScreen").classList.toggle("hidden", loggedIn);
+      document.getElementById("adminScreen").classList.toggle("hidden", !loggedIn);
+      document.getElementById("topbarUser").classList.toggle("hidden", !loggedIn);
+      if (loggedIn) {
+        document.getElementById("userEmail").textContent = state.session.user.email;
+      }
+    }
+
+    // ============================================================
+    // IMAGE UPLOAD
+    // ============================================================
+
+    const STORAGE_BUCKET = "banner-images";
+    const MAX_IMAGE_DIMENSION = 1600; // longest side after resize
+    const JPEG_QUALITY = 0.85;
+    const MAX_UPLOAD_BYTES = 2 * 1024 * 1024; // 2 MB after compression
+
+    /**
+     * Resize an image file to MAX_IMAGE_DIMENSION on the longest side
+     * and re-encode as JPEG. Reduces 10MB iPhone photos to ~150-300KB.
+     * Returns a Blob.
+     */
+    async function compressImage(file) {
+      // Read file into an Image element via object URL
+      const objUrl = URL.createObjectURL(file);
+      try {
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image();
+          i.onload = () => resolve(i);
+          i.onerror = () => reject(new Error("Bild konnte nicht gelesen werden."));
+          i.src = objUrl;
+        });
+
+        // Compute target dimensions
+        let { width, height } = img;
+        if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+          const ratio = Math.min(MAX_IMAGE_DIMENSION / width, MAX_IMAGE_DIMENSION / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        // Draw to canvas
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Encode as JPEG
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob(
+            (b) => b ? resolve(b) : reject(new Error("Kompression fehlgeschlagen.")),
+            "image/jpeg",
+            JPEG_QUALITY
+          );
+        });
+        return blob;
+      } finally {
+        URL.revokeObjectURL(objUrl);
+      }
+    }
+
+    /**
+     * Upload a compressed Blob to Supabase Storage. Returns the public URL.
+     * Path scheme: `<userid>/<timestamp>-<random>.jpg` — keeps things organised
+     * but bucket is public so URL is accessible to landing readers.
+     */
+    async function apiUploadImage(blob) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+
+      const ts = Date.now();
+      const rand = Math.random().toString(36).slice(2, 8);
+      const path = `${ts}-${rand}.jpg`;
+
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,
+        {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${state.session.access_token}`,
+            "Content-Type": "image/jpeg",
+            "x-upsert": "false",
+          },
+          body: blob,
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Upload fehlgeschlagen (${res.status}): ${text}`);
+      }
+      // Public URL — works because bucket is public
+      return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+    }
+
+    /**
+     * Delete an image from Storage given its public URL. Best-effort —
+     * called when a banner with image is deleted; if it fails, the orphan
+     * file just sits in storage but doesn't break anything.
+     */
+    async function apiDeleteImage(publicUrl) {
+      if (!publicUrl) return;
+      const prefix = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/`;
+      if (!publicUrl.startsWith(prefix)) return;
+      const path = publicUrl.slice(prefix.length);
+      try {
+        if (!(await ensureValidSession())) return;
+        await fetch(
+          `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,
+          { method: "DELETE", headers: authHeaders() }
+        );
+      } catch (e) {
+        console.warn("Image cleanup failed (non-fatal):", e);
+      }
+    }
+
+    function formatBytes(n) {
+      if (n < 1024) return `${n} B`;
+      if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+      return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    /**
+     * Wire up an image upload UI for a given context. Used for both
+     * composer (id="new") and edit forms (id=`edit-${bannerId}`).
+     *
+     * `getValue()` / `setValue(url)` plug into the place where the URL
+     * is stored — the composer keeps it in a closure variable, and edit
+     * forms read/write a hidden input.
+     */
+    function wireImageUpload(opts) {
+      const { dropZoneId, inputId, thumbId, thumbImgId, thumbNameId,
+              thumbSizeId, removeId, progressId, progressTextId,
+              getValue, setValue, onChange } = opts;
+
+      const dropZone = document.getElementById(dropZoneId);
+      const input = document.getElementById(inputId);
+      const thumb = document.getElementById(thumbId);
+      const thumbImg = document.getElementById(thumbImgId);
+      const thumbName = document.getElementById(thumbNameId);
+      const thumbSize = document.getElementById(thumbSizeId);
+      const removeBtn = document.getElementById(removeId);
+      const progress = document.getElementById(progressId);
+      const progressText = document.getElementById(progressTextId);
+
+      if (!dropZone || !input) return;
+
+      // Render thumb if a value already exists (e.g. on edit form open)
+      function refreshThumb() {
+        const url = getValue();
+        if (url) {
+          thumbImg.src = url;
+          thumbName.textContent = url.split("/").pop() || "image.jpg";
+          thumbSize.textContent = "Hochgeladen";
+          thumb.classList.remove("hidden");
+          dropZone.classList.add("hidden");
+        } else {
+          thumb.classList.add("hidden");
+          dropZone.classList.remove("hidden");
+        }
+      }
+      refreshThumb();
+
+      async function processFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          showApiError("Bitte eine Bilddatei auswählen.");
+          return;
+        }
+        // Show progress
+        dropZone.classList.add("hidden");
+        thumb.classList.add("hidden");
+        progress.classList.remove("hidden");
+        progressText.textContent = "Bild wird komprimiert…";
+
+        try {
+          const compressed = await compressImage(file);
+          if (compressed.size > MAX_UPLOAD_BYTES) {
+            throw new Error(`Bild zu groß nach Kompression (${formatBytes(compressed.size)}).`);
+          }
+          progressText.textContent = `Bild wird hochgeladen (${formatBytes(compressed.size)})…`;
+          const url = await apiUploadImage(compressed);
+          setValue(url);
+          if (onChange) onChange();
+          renderToast("Bild hochgeladen");
+        } catch (err) {
+          showApiError(err.message);
+        } finally {
+          progress.classList.add("hidden");
+          refreshThumb();
+        }
+      }
+
+      input.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) processFile(file);
+        // Reset so picking the same file again still triggers change
+        input.value = "";
+      });
+
+      // Drag & drop
+      ["dragenter", "dragover"].forEach(ev => {
+        dropZone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach(ev => {
+        dropZone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("dragover");
+        });
+      });
+      dropZone.addEventListener("drop", (e) => {
+        const file = e.dataTransfer?.files?.[0];
+        if (file) processFile(file);
+      });
+
+      // Remove button
+      removeBtn?.addEventListener("click", async () => {
+        const url = getValue();
+        setValue(null);
+        if (onChange) onChange();
+        refreshThumb();
+        // Delete the file from Storage if it was just uploaded for this draft.
+        // (For edit forms we keep the orphan until the banner is saved/deleted —
+        // safer than orphaning a banner with a 404 image URL.)
+        if (opts.deleteOnRemove && url) {
+          await apiDeleteImage(url);
+        }
+      });
+    }
+
+    // ============================================================
+    // FILTERING
+    // ============================================================
+    function getFilterCounts() {
+      const counts = { all: state.banners.length, active: 0, expired: 0, inactive: 0 };
+      state.banners.forEach(b => {
+        const kind = bannerStatus(b).kind;
+        if (counts[kind] !== undefined) counts[kind]++;
+      });
+      return counts;
+    }
+
+    function getFilteredBanners() {
+      if (state.filter === "all") return state.banners;
+      return state.banners.filter(b => bannerStatus(b).kind === state.filter);
+    }
+
+    function setFilter(f) {
+      if (state.filter === f) return;
+      state.filter = f;
+      localStorage.setItem(LS_FILTER, f);
+      // Cancel any in-progress edit when switching tabs — its card may disappear
+      if (state.editingId) state.editingId = null;
+      renderFilters();
+      renderFeed();
+    }
+
+    function renderFilters() {
+      const counts = getFilterCounts();
+      document.querySelectorAll(".filter-tab").forEach(btn => {
+        const f = btn.dataset.filter;
+        btn.classList.toggle("active", state.filter === f);
+        btn.disabled = (f !== "all" && counts[f] === 0 && state.filter !== f);
+        const cnt = btn.querySelector(`[data-count="${f}"]`);
+        if (cnt) cnt.textContent = counts[f];
+      });
+    }
+
+    // ============================================================
+    // RENDER: FEED
+    // ============================================================
+    function renderFeed() {
+      const c = document.getElementById("feedContainer");
+      const filtered = getFilteredBanners();
+
+      // Empty: no banners at all
+      if (state.banners.length === 0) {
+        c.innerHTML = `
+          <div class="feed-empty">
+            <div class="big">Noch keine Banner</div>
+            <div class="small">Erstellen Sie oben den ersten Eintrag</div>
+          </div>`;
+        return;
+      }
+
+      // Empty: this filter has nothing, but other filters do
+      if (filtered.length === 0) {
+        const labels = { active: "aktiven", expired: "abgelaufenen", inactive: "inaktiven" };
+        c.innerHTML = `
+          <div class="feed-empty">
+            <div class="big">Keine ${labels[state.filter] || ""} Banner</div>
+            <div class="small">Wählen Sie einen anderen Filter oder erstellen Sie einen neuen Banner.</div>
+          </div>`;
+        return;
+      }
+
+      c.innerHTML = `<div class="feed">${filtered.map(renderBannerCard).join("")}</div>`;
+
+      // Wire up handlers (only for the rendered subset)
+      filtered.forEach((b) => {
+        const card = c.querySelector(`[data-id="${b.id}"]`);
+        if (!card) return;
+        card.querySelector("[data-action=edit]")?.addEventListener("click", () => startEdit(b.id));
+        card.querySelector("[data-action=delete]")?.addEventListener("click", () => handleDelete(b.id));
+        card.querySelector("[data-action=toggle]")?.addEventListener("click", () => handleToggle(b.id));
+        card.querySelector("[data-action=duplicate]")?.addEventListener("click", () => handleDuplicate(b.id));
+        card.querySelector("[data-action=save]")?.addEventListener("click", () => saveEdit(b.id));
+        card.querySelector("[data-action=cancel]")?.addEventListener("click", () => cancelEdit());
+
+        // Edit-mode: wire up live preview on every field change + initial render
+        if (state.editingId === b.id) {
+          ["edit-text-", "edit-until-", "edit-active-", "edit-cta-label-", "edit-cta-href-"].forEach(prefix => {
+            const el = document.getElementById(prefix + b.id);
+            if (el) {
+              el.addEventListener("input", () => updateEditPreview(b.id));
+              el.addEventListener("change", () => updateEditPreview(b.id));
+            }
+          });
+          // Image upload for this edit form
+          wireImageUpload({
+            dropZoneId: `edit-drop-${b.id}`,
+            inputId: `edit-image-input-${b.id}`,
+            thumbId: `edit-image-thumb-${b.id}`,
+            thumbImgId: `edit-image-thumb-img-${b.id}`,
+            thumbNameId: `edit-image-thumb-name-${b.id}`,
+            thumbSizeId: `edit-image-thumb-size-${b.id}`,
+            removeId: `edit-image-remove-${b.id}`,
+            progressId: `edit-image-progress-${b.id}`,
+            progressTextId: `edit-image-progress-text-${b.id}`,
+            getValue: () => state.editImageUrls[b.id],
+            setValue: (url) => { state.editImageUrls[b.id] = url; },
+            onChange: () => updateEditPreview(b.id),
+            // Don't delete on remove — user may save a different version.
+            // Cleanup happens in saveEdit/cancelEdit.
+            deleteOnRemove: false,
+          });
+          updateEditPreview(b.id);
+        }
+      });
+    }
+
+    function renderBannerCard(b) {
+      const status = bannerStatus(b);
+      const isEditing = state.editingId === b.id;
+
+      if (isEditing) {
+        return `
+          <article class="banner-card editing" data-id="${b.id}">
+            <div class="meta">
+              <span class="badge ${status.kind}">${status.label}</span>
+              <span>Erstellt: ${formatDate(b.created_at)}</span>
+              ${b.updated_at && b.updated_at !== b.created_at ? `<span>· geändert: ${formatDate(b.updated_at)}</span>` : ""}
+            </div>
+            <div class="edit-fields">
+              <div class="field">
+                <label>Text</label>
+                <textarea class="textarea" id="edit-text-${b.id}" maxlength="240">${escapeHtml(b.text || "")}</textarea>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Anzeigen bis</label>
+                  <input type="date" class="input" id="edit-until-${b.id}" value="${b.until_date || ""}" />
+                </div>
+                <div class="field">
+                  <label>&nbsp;</label>
+                  <label class="toggle">
+                    <input type="checkbox" id="edit-active-${b.id}" ${b.active ? "checked" : ""} />
+                    <span class="track"></span>
+                    <span class="text">Aktiv</span>
+                  </label>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Button-Text</label>
+                  <input type="text" class="input" id="edit-cta-label-${b.id}" value="${escapeHtml(b.cta_label || "")}" maxlength="40" />
+                </div>
+                <div class="field">
+                  <label>Button-Link</label>
+                  <input type="text" class="input" id="edit-cta-href-${b.id}" value="${escapeHtml(b.cta_href || "")}" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Bild (optional)</label>
+                <div class="image-upload">
+                  <label class="drop-zone" id="edit-drop-${b.id}">
+                    <span class="drop-zone-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                    </span>
+                    <span class="drop-zone-text">
+                      <span class="main">Bild hochladen oder hierhin ziehen</span>
+                      <span class="hint">JPG, PNG oder WebP · wird automatisch komprimiert</span>
+                    </span>
+                    <input type="file" id="edit-image-input-${b.id}" accept="image/jpeg,image/png,image/webp" />
+                  </label>
+                  <div class="image-thumb hidden" id="edit-image-thumb-${b.id}">
+                    <img alt="" id="edit-image-thumb-img-${b.id}" />
+                    <div class="image-thumb-info">
+                      <span class="name" id="edit-image-thumb-name-${b.id}">image.jpg</span>
+                      <span class="size" id="edit-image-thumb-size-${b.id}">—</span>
+                    </div>
+                    <button type="button" class="image-thumb-remove" id="edit-image-remove-${b.id}" title="Bild entfernen">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="upload-progress hidden" id="edit-image-progress-${b.id}">
+                    <span id="edit-image-progress-text-${b.id}">Bild wird hochgeladen…</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live preview -->
+            <div class="preview-section" id="edit-preview-section-${b.id}">
+              <div class="preview-label">
+                <span>Vorschau</span>
+                <span class="preview-status hidden" data-preview-status></span>
+              </div>
+              <div class="banner-preview">
+                <span class="banner-preview-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </span>
+                <span class="banner-preview-text empty" data-preview-text>Hier erscheint Ihre Vorschau</span>
+                <a class="banner-preview-cta hidden" data-preview-cta>
+                  <span data-preview-cta-label></span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="edit-actions">
+              <button class="btn btn-primary btn-sm" data-action="save">Speichern</button>
+              <button class="btn btn-ghost btn-sm" data-action="cancel">Abbrechen</button>
+            </div>
+          </article>`;
+      }
+
+      const ctaPreview = b.cta_label
+        ? `<div class="cta-preview">${escapeHtml(b.cta_label)}
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+               <line x1="5" y1="12" x2="19" y2="12"/>
+               <polyline points="12 5 19 12 12 19"/>
+             </svg>
+           </div>`
+        : "";
+
+      const imagePreview = b.image_url
+        ? `<img class="banner-card-image" src="${escapeHtml(b.image_url)}" alt="">`
+        : "";
+
+      const untilLine = b.until_date
+        ? `<span>Anzeigen bis: ${formatDate(b.until_date)}</span>`
+        : `<span>Ohne Enddatum</span>`;
+
+      return `
+        <article class="banner-card" data-id="${b.id}">
+          <div class="meta">
+            <span class="badge ${status.kind}">${status.label}</span>
+            ${untilLine}
+            <span>· erstellt: ${formatDate(b.created_at)}</span>
+          </div>
+          ${imagePreview}
+          <div class="text">${escapeHtml(b.text)}</div>
+          ${ctaPreview}
+          <div class="actions">
+            <button class="btn btn-ghost btn-sm" data-action="toggle">${b.active ? "Pausieren" : "Aktivieren"}</button>
+            <button class="btn btn-ghost btn-sm" data-action="edit">Bearbeiten</button>
+            <button class="btn btn-ghost btn-sm" data-action="duplicate">Duplizieren</button>
+            <span class="spacer"></span>
+            <button class="btn btn-danger btn-sm" data-action="delete">Löschen</button>
+          </div>
+        </article>`;
+    }
+
+    // ============================================================
+    // ACTIONS
+    // ============================================================
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideLoginError();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true;
+      btn.textContent = "Anmelden…";
+      try {
+        const session = await apiLogin(email, password);
+        saveSession(session);
+        renderAuth();
+        await loadBanners();
+        // If user was last on Projekte tab, load that data too
+        if (state.activeTab === "projekte") {
+          await loadProjects();
+        }
+      } catch (err) {
+        showLoginError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Anmelden";
+      }
+    }
+
+    async function handleLogout() {
+      await apiLogout();
+      clearSession();
+      state.banners = [];
+      state.editingId = null;
+      state.projects = [];
+      state.editingProjectId = null;
+      state._projectsLoaded = false;
+      renderAuth();
+    }
+
+    async function loadBanners() {
+      hideApiError();
+      try {
+        state.banners = await apiList();
+      } catch (err) {
+        showApiError(err.message);
+        state.banners = [];
+      } finally {
+        document.getElementById("loadingState")?.remove();
+        renderFilters();
+        renderFeed();
+      }
+    }
+
+    function readComposer() {
+      const text = document.getElementById("newText").value.trim();
+      const until = document.getElementById("newUntil").value || null;
+      const ctaLabel = document.getElementById("newCtaLabel").value.trim() || null;
+      const ctaHref = document.getElementById("newCtaHref").value.trim() || null;
+      const active = document.getElementById("newActive").checked;
+      return {
+        text,
+        until_date: until,
+        cta_label: ctaLabel,
+        cta_href: ctaHref,
+        active,
+        image_url: state.composerImageUrl,
+      };
+    }
+
+    async function clearComposer() {
+      // If there's an unpublished image, delete it from storage to keep things tidy
+      if (state.composerImageUrl) {
+        const oldUrl = state.composerImageUrl;
+        state.composerImageUrl = null;
+        apiDeleteImage(oldUrl); // fire and forget
+      }
+      document.getElementById("newText").value = "";
+      document.getElementById("newUntil").value = "";
+      document.getElementById("newCtaLabel").value = "";
+      document.getElementById("newCtaHref").value = "";
+      document.getElementById("newActive").checked = true;
+      // Reset image UI
+      document.getElementById("newImageThumb")?.classList.add("hidden");
+      document.getElementById("newDropZone")?.classList.remove("hidden");
+      updateComposerState();
+      updateComposerPreview();
+    }
+
+    async function handlePublish() {
+      const payload = readComposer();
+      if (!payload.text) return;
+      // CTA validation
+      if ((payload.cta_label && !payload.cta_href) || (payload.cta_href && !payload.cta_label)) {
+        showApiError("Wenn ein Button verwendet wird, müssen Text und Link gesetzt sein.");
+        return;
+      }
+      hideApiError();
+      const btn = document.getElementById("publishBtn");
+      btn.disabled = true;
+      btn.textContent = "Wird gespeichert…";
+      try {
+        const created = await apiCreate(payload);
+        state.banners = [created, ...state.banners];
+        // Image is now attached to a published banner — don't delete it
+        state.composerImageUrl = null;
+        // Reset form WITHOUT triggering image cleanup (already detached above)
+        document.getElementById("newText").value = "";
+        document.getElementById("newUntil").value = "";
+        document.getElementById("newCtaLabel").value = "";
+        document.getElementById("newCtaHref").value = "";
+        document.getElementById("newActive").checked = true;
+        document.getElementById("newImageThumb")?.classList.add("hidden");
+        document.getElementById("newDropZone")?.classList.remove("hidden");
+        updateComposerState();
+        updateComposerPreview();
+        renderFilters();
+        renderFeed();
+        renderToast("Banner veröffentlicht");
+      } catch (err) {
+        showApiError(err.message);
+      } finally {
+        btn.textContent = "Veröffentlichen";
+        updateComposerState();
+      }
+    }
+
+    function startEdit(id) {
+      const b = state.banners.find(x => x.id === id);
+      if (!b) return;
+      // Seed the edit-image draft with the banner's current image
+      state.editImageUrls[id] = b.image_url || null;
+      state.editingId = id;
+      renderFeed();
+    }
+    function cancelEdit() {
+      // If the user uploaded a NEW image while editing but didn't save,
+      // it's now orphaned — clean it up.
+      const id = state.editingId;
+      if (id) {
+        const original = state.banners.find(x => x.id === id);
+        const draft = state.editImageUrls[id];
+        if (draft && draft !== original?.image_url) {
+          apiDeleteImage(draft); // fire and forget
+        }
+        delete state.editImageUrls[id];
+      }
+      state.editingId = null;
+      renderFeed();
+    }
+
+    async function saveEdit(id) {
+      const text = document.getElementById(`edit-text-${id}`).value.trim();
+      const until = document.getElementById(`edit-until-${id}`).value || null;
+      const active = document.getElementById(`edit-active-${id}`).checked;
+      const ctaLabel = document.getElementById(`edit-cta-label-${id}`).value.trim() || null;
+      const ctaHref = document.getElementById(`edit-cta-href-${id}`).value.trim() || null;
+      const imageUrl = state.editImageUrls[id] ?? null;
+
+      if (!text) { showApiError("Der Text darf nicht leer sein."); return; }
+      if ((ctaLabel && !ctaHref) || (ctaHref && !ctaLabel)) {
+        showApiError("Wenn ein Button verwendet wird, müssen Text und Link gesetzt sein.");
+        return;
+      }
+
+      const original = state.banners.find(b => b.id === id);
+      const oldImage = original?.image_url || null;
+
+      hideApiError();
+      try {
+        const updated = await apiUpdate(id, {
+          text, until_date: until, active,
+          cta_label: ctaLabel, cta_href: ctaHref,
+          image_url: imageUrl,
+        });
+        state.banners = state.banners.map(b => (b.id === id ? updated : b));
+        // Old image cleanup (best-effort)
+        if (oldImage && oldImage !== imageUrl) {
+          apiDeleteImage(oldImage); // fire and forget
+        }
+        delete state.editImageUrls[id];
+        state.editingId = null;
+        renderFilters();
+        renderFeed();
+        renderToast("Banner gespeichert");
+      } catch (err) {
+        showApiError(err.message);
+      }
+    }
+
+    async function handleDelete(id) {
+      if (!confirm("Diesen Banner wirklich löschen? Das kann nicht rückgängig gemacht werden.")) return;
+      hideApiError();
+      const previous = state.banners;
+      const target = previous.find(b => b.id === id);
+      // Optimistic update
+      state.banners = state.banners.filter(b => b.id !== id);
+      renderFilters();
+      renderFeed();
+      try {
+        await apiDelete(id);
+        // Best-effort image cleanup (non-fatal if it fails)
+        if (target?.image_url) apiDeleteImage(target.image_url);
+        renderToast("Banner gelöscht");
+      } catch (err) {
+        // Revert
+        state.banners = previous;
+        renderFilters();
+        renderFeed();
+        showApiError(err.message);
+      }
+    }
+
+    async function handleToggle(id) {
+      const b = state.banners.find(x => x.id === id);
+      if (!b) return;
+      hideApiError();
+      try {
+        const updated = await apiUpdate(id, { active: !b.active });
+        state.banners = state.banners.map(x => (x.id === id ? updated : x));
+        renderFilters();
+        renderFeed();
+        renderToast(updated.active ? "Banner aktiviert" : "Banner pausiert");
+      } catch (err) {
+        showApiError(err.message);
+      }
+    }
+
+    /**
+     * Copy a banner's fields into the composer for re-publishing.
+     * Useful for recurring campaigns ("Sommer-Aktion 2026" from last year's).
+     * If the original's until_date is in the past, we clear it — copying an
+     * old expired banner almost always means the user wants a new date.
+     * The image is NOT copied — image is usually visual context for the
+     * specific announcement, and reusing it tends to mislead.
+     */
+    function handleDuplicate(id) {
+      const b = state.banners.find(x => x.id === id);
+      if (!b) return;
+
+      // Drop any in-progress composer image (we're starting fresh)
+      if (state.composerImageUrl) {
+        apiDeleteImage(state.composerImageUrl); // fire and forget
+        state.composerImageUrl = null;
+      }
+
+      document.getElementById("newText").value = b.text || "";
+
+      let until = "";
+      if (b.until_date) {
+        const dt = new Date(b.until_date + "T23:59:59");
+        if (dt >= new Date()) until = b.until_date;
+      }
+      document.getElementById("newUntil").value = until;
+
+      document.getElementById("newCtaLabel").value = b.cta_label || "";
+      document.getElementById("newCtaHref").value = b.cta_href || "";
+      document.getElementById("newActive").checked = !!b.active;
+
+      // Reset image UI to empty state
+      document.getElementById("newImageThumb")?.classList.add("hidden");
+      document.getElementById("newDropZone")?.classList.remove("hidden");
+
+      // Cancel any in-progress edit
+      state.editingId = null;
+
+      updateComposerState();
+      updateComposerPreview();
+      renderFeed();
+
+      document.querySelector(".composer").scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => document.getElementById("newText").focus(), 400);
+
+      renderToast("In den Composer kopiert");
+    }
+
+    function updateComposerState() {
+      const text = document.getElementById("newText").value;
+      document.getElementById("publishBtn").disabled = text.trim().length === 0;
+      document.getElementById("charCount").textContent = `${text.length} / 240 Zeichen`;
+    }
+
+    /**
+     * Render a live preview of how the banner will look on the website.
+     * `containerEl` is the .preview-section wrapper — we look up children by data-attrs.
+     */
+    function updatePreview(containerEl, opts) {
+      const { text, ctaLabel, ctaHref, active, untilDate, imageUrl } = opts;
+      const previewEl = containerEl.querySelector(".banner-preview");
+      const textEl = containerEl.querySelector("[data-preview-text]");
+      const ctaEl = containerEl.querySelector("[data-preview-cta]");
+      const ctaLabelEl = containerEl.querySelector("[data-preview-cta-label]");
+      const statusEl = containerEl.querySelector("[data-preview-status]");
+      const iconEl = containerEl.querySelector(".banner-preview-icon");
+
+      // Reset state classes
+      previewEl.classList.remove("inactive", "expired");
+      statusEl.classList.remove("inactive", "expired");
+      statusEl.classList.add("hidden");
+
+      // --- Image (replaces the star icon when present) ---
+      // Remove any previous image-thumbnail
+      const existingImg = previewEl.querySelector(".banner-preview-image");
+      if (existingImg) existingImg.remove();
+      if (imageUrl) {
+        const img = document.createElement("img");
+        img.className = "banner-preview-image";
+        img.src = imageUrl;
+        img.alt = "";
+        // Insert before the icon (or replace it visually — we hide icon when image present)
+        if (iconEl) iconEl.style.display = "none";
+        previewEl.insertBefore(img, previewEl.firstChild);
+      } else if (iconEl) {
+        iconEl.style.display = "";
+      }
+
+      // --- Text ---
+      if (text && text.trim()) {
+        textEl.textContent = text;
+        textEl.classList.remove("empty");
+      } else {
+        textEl.textContent = "Hier erscheint Ihre Vorschau";
+        textEl.classList.add("empty");
+      }
+
+      // --- CTA ---
+      if (ctaLabel && ctaLabel.trim()) {
+        ctaLabelEl.textContent = ctaLabel;
+        ctaEl.classList.remove("hidden");
+        if (ctaHref) ctaEl.setAttribute("href", ctaHref);
+        else ctaEl.removeAttribute("href");
+      } else {
+        ctaEl.classList.add("hidden");
+      }
+
+      // --- Status ---
+      let kind = null;
+      let label = "";
+      if (!active) { kind = "inactive"; label = "inaktiv"; }
+      else if (untilDate) {
+        const until = new Date(untilDate + "T23:59:59");
+        if (until < new Date()) { kind = "expired"; label = "abgelaufen"; }
+      }
+      if (kind) {
+        previewEl.classList.add(kind);
+        statusEl.classList.add(kind);
+        statusEl.classList.remove("hidden");
+        statusEl.textContent = label;
+      }
+    }
+
+    function updateComposerPreview() {
+      const containerEl = document.getElementById("newPreview").parentElement;
+      updatePreview(containerEl, {
+        text: document.getElementById("newText").value,
+        ctaLabel: document.getElementById("newCtaLabel").value,
+        ctaHref: document.getElementById("newCtaHref").value,
+        active: document.getElementById("newActive").checked,
+        untilDate: document.getElementById("newUntil").value,
+        imageUrl: state.composerImageUrl,
+      });
+    }
+
+    function updateEditPreview(id) {
+      const containerEl = document.getElementById(`edit-preview-section-${id}`);
+      if (!containerEl) return;
+      updatePreview(containerEl, {
+        text: document.getElementById(`edit-text-${id}`).value,
+        ctaLabel: document.getElementById(`edit-cta-label-${id}`).value,
+        ctaHref: document.getElementById(`edit-cta-href-${id}`).value,
+        active: document.getElementById(`edit-active-${id}`).checked,
+        untilDate: document.getElementById(`edit-until-${id}`).value,
+        imageUrl: state.editImageUrls[id],
+      });
+    }
+
+    // ============================================================
+    // PROJECTS — STATE, API, RENDER, ACTIONS
+    // ============================================================
+    // The Projekte tab mirrors the Banner tab's CRUD pattern but with
+    // multi-image uploads, tag pills, and a richer card layout.
+    //
+    // Schema (see projects-schema.sql for the Supabase setup):
+    //   projects {
+    //     id            uuid pk
+    //     sort_order    int
+    //     display_id    text          -- visible identifier ("01", "02")
+    //     title, location, description text
+    //     tags          text[]        -- ['fenster', 'innentueren', ...]
+    //     photos        jsonb         -- [{url, thumb_url}, ...]  ordered
+    //     cover_url     text          -- denormalised photos[0].url
+    //     active        boolean
+    //     created_at, updated_at timestamptz
+    //   }
+
+    const PROJECTS_BUCKET = "project-images";
+    const PROJ_TAGS = [
+      { key: "fenster",        label: "Fenster" },
+      { key: "innentueren",    label: "Innentüren" },
+      { key: "aussentueren",   label: "Außentüren" },
+      { key: "bodenverlegung", label: "Bodenverlegung" },
+    ];
+    const PROJ_TAG_LABEL = Object.fromEntries(PROJ_TAGS.map(t => [t.key, t.label]));
+
+    // ---- Lightweight toast helper (used after CRUD success) ----
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("visible");
+      clearTimeout(showToast._tid);
+      showToast._tid = setTimeout(() => t.classList.remove("visible"), 2200);
+    }
+
+    // ---- Tab switching ----
+    function switchTab(tab) {
+      state.activeTab = tab;
+      localStorage.setItem(LS_TAB, tab);
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      document.getElementById("tabBanner").classList.toggle("hidden", tab !== "banner");
+      document.getElementById("tabProjekte").classList.toggle("hidden", tab !== "projekte");
+      // Lazy-load: only fetch projects on first visit to that tab
+      if (tab === "projekte" && !state._projectsLoaded && state.session) {
+        loadProjects();
+      }
+    }
+
+    // ---- Project API ----
+    async function apiListProjects() {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/projects?select=*&order=sort_order.asc`,
+        { headers: authHeaders() }
+      );
+      if (!res.ok) throw new Error(`Liste konnte nicht geladen werden (${res.status}): ${await res.text()}`);
+      return res.json();
+    }
+
+    async function apiCreateProject(payload) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects`, {
+        method: "POST",
+        headers: { ...authHeaders(), Prefer: "return=representation" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht angelegt werden (${res.status}): ${await res.text()}`);
+      const arr = await res.json();
+      return arr[0];
+    }
+
+    async function apiUpdateProject(id, payload) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders(), Prefer: "return=representation" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht gespeichert werden (${res.status}): ${await res.text()}`);
+      const arr = await res.json();
+      return arr[0];
+    }
+
+    async function apiDeleteProject(id) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error(`Konnte nicht gelöscht werden (${res.status}): ${await res.text()}`);
+    }
+
+    /**
+     * Upload to project-images bucket. Returns the public URL.
+     * Mirrors apiUploadImage but in a separate bucket so banner/project
+     * media policies can diverge later.
+     */
+    async function apiUploadProjectImage(blob) {
+      if (!(await ensureValidSession())) throw new Error("Sitzung abgelaufen.");
+      const ts = Date.now();
+      const rand = Math.random().toString(36).slice(2, 8);
+      const path = `${ts}-${rand}.jpg`;
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/${PROJECTS_BUCKET}/${path}`,
+        {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${state.session.access_token}`,
+            "Content-Type": "image/jpeg",
+            "x-upsert": "false",
+          },
+          body: blob,
+        }
+      );
+      if (!res.ok) throw new Error(`Upload fehlgeschlagen (${res.status}): ${await res.text()}`);
+      return `${SUPABASE_URL}/storage/v1/object/public/${PROJECTS_BUCKET}/${path}`;
+    }
+
+    /**
+     * Best-effort delete from Storage. Only removes objects we actually own
+     * (URL begins with our bucket prefix) so seeded URLs pointing at
+     * GitHub Pages remain untouched.
+     */
+    async function apiDeleteProjectImage(publicUrl) {
+      if (!publicUrl) return;
+      const prefix = `${SUPABASE_URL}/storage/v1/object/public/${PROJECTS_BUCKET}/`;
+      if (!publicUrl.startsWith(prefix)) return;
+      const path = publicUrl.slice(prefix.length);
+      try {
+        if (!(await ensureValidSession())) return;
+        await fetch(
+          `${SUPABASE_URL}/storage/v1/object/${PROJECTS_BUCKET}/${path}`,
+          { method: "DELETE", headers: authHeaders() }
+        );
+      } catch (e) {
+        console.warn("Project image cleanup failed (non-fatal):", e);
+      }
+    }
+
+    // ---- Error display ----
+    function showProjApiError(msg) {
+      const el = document.getElementById("projApiError");
+      document.getElementById("projApiErrorText").textContent = msg;
+      el.classList.add("visible");
+    }
+    function hideProjApiError() {
+      document.getElementById("projApiError").classList.remove("visible");
+    }
+
+    // ---- Tag pill picker logic ----
+    function renderTagPills(containerEl, selectedSet) {
+      containerEl.querySelectorAll(".tag-pill").forEach(pill => {
+        pill.classList.toggle("active", selectedSet.has(pill.dataset.tag));
+      });
+    }
+    function bindTagPills(containerEl, tagSet, onChange) {
+      containerEl.querySelectorAll(".tag-pill").forEach(pill => {
+        // Clone to drop any old listeners (re-render safe)
+        const fresh = pill.cloneNode(true);
+        pill.replaceWith(fresh);
+      });
+      containerEl.querySelectorAll(".tag-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+          const k = pill.dataset.tag;
+          if (tagSet.has(k)) tagSet.delete(k); else tagSet.add(k);
+          renderTagPills(containerEl, tagSet);
+          if (onChange) onChange();
+        });
+      });
+    }
+
+    // ---- Multi-image upload ----
+    function renderPhotosGrid(gridEl, photos, opts) {
+      if (!photos.length) {
+        gridEl.classList.add("hidden");
+        gridEl.innerHTML = "";
+        return;
+      }
+      gridEl.classList.remove("hidden");
+      gridEl.innerHTML = photos.map((p, i) => {
+        const isCover = i === 0;
+        const thumb = p.thumb_url || p.url;
+        return `
+          <div class="photo-tile" data-idx="${i}">
+            ${isCover ? `<span class="photo-cover-badge">Deckbild</span>` : ""}
+            <img src="${escapeHtml(thumb)}" alt="" loading="lazy" />
+            <div class="photo-tile-actions">
+              <div class="photo-tile-btn-group">
+                <button type="button" class="photo-tile-btn" data-action="up" ${i === 0 ? "disabled" : ""} title="Nach vorn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button type="button" class="photo-tile-btn" data-action="down" ${i === photos.length - 1 ? "disabled" : ""} title="Nach hinten">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <button type="button" class="photo-tile-btn danger" data-action="remove" title="Entfernen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>`;
+      }).join("");
+      gridEl.querySelectorAll(".photo-tile").forEach(tile => {
+        const idx = parseInt(tile.dataset.idx);
+        tile.querySelector('[data-action="up"]')?.addEventListener("click", () => opts.onMove(idx, -1));
+        tile.querySelector('[data-action="down"]')?.addEventListener("click", () => opts.onMove(idx, +1));
+        tile.querySelector('[data-action="remove"]')?.addEventListener("click", () => opts.onRemove(idx));
+      });
+    }
+
+    function wireMultiImageUpload(opts) {
+      const { dropZoneId, inputId, progressId, progressTextId,
+              gridId, hintId, getPhotos, setPhotos, onChange } = opts;
+
+      const dropZone = document.getElementById(dropZoneId);
+      const input = document.getElementById(inputId);
+      const progress = document.getElementById(progressId);
+      const progressText = document.getElementById(progressTextId);
+      const grid = document.getElementById(gridId);
+      const hint = hintId ? document.getElementById(hintId) : null;
+      if (!dropZone || !input || !grid) return;
+
+      function refresh() {
+        const photos = getPhotos();
+        renderPhotosGrid(grid, photos, {
+          onRemove: (idx) => {
+            const cur = getPhotos().slice();
+            const removed = cur.splice(idx, 1)[0];
+            setPhotos(cur);
+            if (removed?.url) apiDeleteProjectImage(removed.url);
+            if (removed?.thumb_url && removed.thumb_url !== removed.url) apiDeleteProjectImage(removed.thumb_url);
+            refresh();
+            if (onChange) onChange();
+          },
+          onMove: (idx, dir) => {
+            const cur = getPhotos().slice();
+            const j = idx + dir;
+            if (j < 0 || j >= cur.length) return;
+            [cur[idx], cur[j]] = [cur[j], cur[idx]];
+            setPhotos(cur);
+            refresh();
+            if (onChange) onChange();
+          },
+        });
+        if (hint) hint.style.display = photos.length > 0 ? "block" : "none";
+      }
+
+      async function handleFiles(fileList) {
+        const files = Array.from(fileList).filter(f => /^image\//.test(f.type));
+        if (!files.length) return;
+
+        progress.classList.remove("hidden");
+        let ok = 0;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          progressText.textContent = `Bild ${i + 1} / ${files.length} wird hochgeladen…`;
+          try {
+            const blob = await compressImage(file);
+            if (blob.size > MAX_UPLOAD_BYTES) {
+              showProjApiError(`Bild "${file.name}" ist zu groß (${formatBytes(blob.size)}). Maximum: ${formatBytes(MAX_UPLOAD_BYTES)}.`);
+              continue;
+            }
+            const url = await apiUploadProjectImage(blob);
+            // For new uploads we use one URL for both. The schema keeps both
+            // fields so seeded data with separate thumbs continues to work.
+            const cur = getPhotos().slice();
+            cur.push({ url, thumb_url: url });
+            setPhotos(cur);
+            ok++;
+          } catch (err) {
+            showProjApiError(`Upload fehlgeschlagen: ${err.message}`);
+          }
+        }
+        progress.classList.add("hidden");
+        input.value = "";
+        refresh();
+        if (onChange) onChange();
+        if (ok > 0) showToast(`${ok} Bild${ok === 1 ? "" : "er"} hochgeladen`);
+      }
+
+      // Reset listeners (in case re-wired on re-render)
+      input.onchange = () => handleFiles(input.files);
+      dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("drag-over"); };
+      dropZone.ondragleave = () => dropZone.classList.remove("drag-over");
+      dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("drag-over");
+        handleFiles(e.dataTransfer.files);
+      };
+      refresh();
+    }
+
+    // ---- Composer state & handlers ----
+    function updateProjectComposerState() {
+      const displayId = document.getElementById("projNewDisplayId").value.trim();
+      const title = document.getElementById("projNewTitle").value.trim();
+      const location = document.getElementById("projNewLocation").value.trim();
+      const tags = state.projComposer.tags;
+      const photos = state.projComposer.photos;
+      const valid = !!displayId && !!title && !!location && tags.size > 0 && photos.length > 0;
+      document.getElementById("projPublishBtn").disabled = !valid;
+
+      const desc = document.getElementById("projNewDescription").value;
+      document.getElementById("projNewDescCount").textContent = desc.length;
+    }
+
+    function resetProjectComposer() {
+      document.getElementById("projNewDisplayId").value = "";
+      document.getElementById("projNewTitle").value = "";
+      document.getElementById("projNewLocation").value = "";
+      document.getElementById("projNewDescription").value = "";
+      document.getElementById("projNewActive").checked = true;
+      state.projComposer.tags.clear();
+      state.projComposer.photos = [];
+      renderTagPills(document.getElementById("projNewTags"), state.projComposer.tags);
+      const grid = document.getElementById("projNewPhotosGrid");
+      grid.innerHTML = "";
+      grid.classList.add("hidden");
+      document.getElementById("projNewPhotosHint").style.display = "none";
+      updateProjectComposerState();
+    }
+
+    async function handlePublishProject() {
+      hideProjApiError();
+      const displayId = document.getElementById("projNewDisplayId").value.trim();
+      const title = document.getElementById("projNewTitle").value.trim();
+      const location = document.getElementById("projNewLocation").value.trim();
+      const description = document.getElementById("projNewDescription").value.trim();
+      const active = document.getElementById("projNewActive").checked;
+      const tags = Array.from(state.projComposer.tags);
+      const photos = state.projComposer.photos.slice();
+
+      if (!displayId || !title || !location || !tags.length || !photos.length) {
+        showProjApiError("Bitte alle Pflichtfelder ausfüllen.");
+        return;
+      }
+
+      // Append to the end by default
+      const maxSort = state.projects.reduce((m, p) => Math.max(m, p.sort_order || 0), 0);
+      const payload = {
+        display_id: displayId,
+        title, location, description,
+        tags, photos,
+        cover_url: photos[0].url,
+        active,
+        sort_order: maxSort + 10,
+      };
+
+      const btn = document.getElementById("projPublishBtn");
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = "Veröffentliche…";
+      try {
+        const created = await apiCreateProject(payload);
+        state.projects.push(created);
+        state.projects.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        resetProjectComposer();
+        renderProjectsFilters();
+        renderProjectsFeed();
+        showToast("Projekt veröffentlicht");
+      } catch (err) {
+        showProjApiError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+        updateProjectComposerState();
+      }
+    }
+
+    // ---- Filters ----
+    function getProjectsFilterCounts() {
+      const c = { all: state.projects.length, fenster: 0, innentueren: 0, aussentueren: 0, bodenverlegung: 0, inactive: 0 };
+      state.projects.forEach(p => {
+        if (!p.active) c.inactive++;
+        (p.tags || []).forEach(t => { if (t in c) c[t]++; });
+      });
+      return c;
+    }
+    function getFilteredProjects() {
+      const f = state.projFilter;
+      if (f === "all") return state.projects;
+      if (f === "inactive") return state.projects.filter(p => !p.active);
+      return state.projects.filter(p => (p.tags || []).includes(f));
+    }
+    function setProjectsFilter(f) {
+      state.projFilter = f;
+      localStorage.setItem(LS_PROJ_FILTER, f);
+      if (state.editingProjectId) state.editingProjectId = null;
+      renderProjectsFilters();
+      renderProjectsFeed();
+    }
+    function renderProjectsFilters() {
+      const counts = getProjectsFilterCounts();
+      document.querySelectorAll("[data-proj-filter]").forEach(btn => {
+        const f = btn.dataset.projFilter;
+        btn.classList.toggle("active", state.projFilter === f);
+        const cnt = btn.querySelector(`[data-proj-count="${f}"]`);
+        if (cnt) cnt.textContent = counts[f];
+      });
+    }
+
+    // ---- Render ----
+    async function loadProjects() {
+      const c = document.getElementById("projFeedContainer");
+      c.innerHTML = '<div class="loading">Wird geladen…</div>';
+      try {
+        state.projects = await apiListProjects();
+        state._projectsLoaded = true;
+        renderProjectsFilters();
+        renderProjectsFeed();
+      } catch (err) {
+        c.innerHTML = `<div class="feed-empty"><div class="big">Fehler beim Laden</div><div class="small">${escapeHtml(err.message)}</div></div>`;
+        showProjApiError(err.message);
+      }
+    }
+
+    function renderProjectsFeed() {
+      const c = document.getElementById("projFeedContainer");
+      if (state.projects.length === 0) {
+        c.innerHTML = `<div class="feed-empty"><div class="big">Noch keine Projekte</div><div class="small">Legen Sie oben das erste Projekt an oder importieren Sie die Initialdaten via SQL.</div></div>`;
+        return;
+      }
+      const filtered = getFilteredProjects();
+      if (filtered.length === 0) {
+        c.innerHTML = `<div class="feed-empty"><div class="big">Keine Projekte in dieser Kategorie</div><div class="small">Wählen Sie einen anderen Filter.</div></div>`;
+        return;
+      }
+      c.innerHTML = filtered.map(renderProjectCard).join("");
+
+      filtered.forEach(p => {
+        const card = c.querySelector(`[data-pid="${p.id}"]`);
+        if (!card) return;
+        card.querySelector('[data-action="edit"]')?.addEventListener("click", () => startEditProject(p.id));
+        card.querySelector('[data-action="delete"]')?.addEventListener("click", () => handleDeleteProject(p.id));
+        card.querySelector('[data-action="toggle"]')?.addEventListener("click", () => handleToggleProject(p.id));
+        card.querySelector('[data-action="save"]')?.addEventListener("click", () => saveEditProject(p.id));
+        card.querySelector('[data-action="cancel"]')?.addEventListener("click", () => cancelEditProject());
+
+        if (state.editingProjectId === p.id) {
+          // Tag pills
+          bindTagPills(
+            document.getElementById(`proj-edit-tags-${p.id}`),
+            state.projEditTags[p.id]
+          );
+          // Photos picker
+          wireMultiImageUpload({
+            dropZoneId: `proj-edit-drop-${p.id}`,
+            inputId: `proj-edit-image-input-${p.id}`,
+            progressId: `proj-edit-image-progress-${p.id}`,
+            progressTextId: `proj-edit-image-progress-text-${p.id}`,
+            gridId: `proj-edit-photos-grid-${p.id}`,
+            hintId: null,
+            getPhotos: () => state.projEditPhotos[p.id] || [],
+            setPhotos: (arr) => { state.projEditPhotos[p.id] = arr; },
+          });
+          // Description char counter
+          const desc = document.getElementById(`proj-edit-description-${p.id}`);
+          const counter = document.getElementById(`proj-edit-desc-count-${p.id}`);
+          if (desc && counter) {
+            const sync = () => counter.textContent = desc.value.length;
+            desc.addEventListener("input", sync);
+            sync();
+          }
+        }
+      });
+    }
+
+    function renderProjectCard(p) {
+      const isEditing = state.editingProjectId === p.id;
+      const cover = p.cover_url || p.photos?.[0]?.thumb_url || p.photos?.[0]?.url;
+      const tagBadges = (p.tags || []).map(t =>
+        `<span class="tag-badge">${escapeHtml(PROJ_TAG_LABEL[t] || t)}</span>`
+      ).join("");
+      const photoCount = (p.photos || []).length;
+
+      if (isEditing) {
+        const editTags = state.projEditTags[p.id] || new Set(p.tags || []);
+        return `
+          <article class="project-card editing" data-pid="${p.id}">
+            <div class="project-edit-body">
+              <div class="composer-fields">
+                <div class="field-row">
+                  <div class="field" style="max-width:140px">
+                    <label>Nummer</label>
+                    <input type="text" class="input" id="proj-edit-display-id-${p.id}" value="${escapeHtml(p.display_id || '')}" maxlength="6" />
+                  </div>
+                  <div class="field">
+                    <label>Titel</label>
+                    <input type="text" class="input" id="proj-edit-title-${p.id}" value="${escapeHtml(p.title || '')}" maxlength="120" />
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <label>Ort</label>
+                    <input type="text" class="input" id="proj-edit-location-${p.id}" value="${escapeHtml(p.location || '')}" maxlength="60" />
+                  </div>
+                  <div class="field">
+                    <label>&nbsp;</label>
+                    <label class="toggle">
+                      <input type="checkbox" id="proj-edit-active-${p.id}" ${p.active ? 'checked' : ''} />
+                      <span class="track"></span>
+                      <span class="text">Sichtbar</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Kategorien</label>
+                  <div class="tag-pills" id="proj-edit-tags-${p.id}">
+                    ${PROJ_TAGS.map(t => `<button type="button" class="tag-pill ${editTags.has(t.key) ? 'active' : ''}" data-tag="${t.key}">${t.label}</button>`).join("")}
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Beschreibung</label>
+                  <textarea class="textarea" id="proj-edit-description-${p.id}" rows="4" maxlength="800">${escapeHtml(p.description || '')}</textarea>
+                  <span class="field-hint"><span id="proj-edit-desc-count-${p.id}">0</span> / 800 Zeichen</span>
+                </div>
+                <div class="field">
+                  <label>Bilder</label>
+                  <div class="image-upload">
+                    <label class="drop-zone" id="proj-edit-drop-${p.id}">
+                      <span class="drop-zone-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                      </span>
+                      <span class="drop-zone-text">
+                        <span class="main">Weitere Bilder hinzufügen</span>
+                        <span class="hint">Mehrere Dateien gleichzeitig möglich · automatisch komprimiert</span>
+                      </span>
+                      <input type="file" id="proj-edit-image-input-${p.id}" accept="image/jpeg,image/png,image/webp" multiple />
+                    </label>
+                    <div class="upload-progress hidden" id="proj-edit-image-progress-${p.id}">
+                      <span id="proj-edit-image-progress-text-${p.id}">Bild wird hochgeladen…</span>
+                    </div>
+                    <div class="photos-grid" id="proj-edit-photos-grid-${p.id}"></div>
+                    <span class="field-hint">Das erste Bild wird als Deckbild verwendet. Reihenfolge mit den Pfeilen ändern.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="edit-actions">
+                <button class="btn btn-primary btn-sm" data-action="save">Speichern</button>
+                <button class="btn btn-ghost btn-sm" data-action="cancel">Abbrechen</button>
+              </div>
+            </div>
+          </article>`;
+      }
+
+      return `
+        <article class="project-card ${p.active ? '' : 'inactive'}" data-pid="${p.id}">
+          <div class="project-card-cover">
+            ${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : ""}
+          </div>
+          <div class="project-card-info">
+            <div class="project-card-meta">
+              <span class="display-id">№ ${escapeHtml(p.display_id || '')}</span>
+              ${!p.active ? `<span class="badge">versteckt</span>` : ""}
+              <span>${photoCount} Bild${photoCount === 1 ? "" : "er"}</span>
+              <span>· erstellt: ${formatDate(p.created_at)}</span>
+            </div>
+            <h3 class="project-card-title">${escapeHtml(p.title || '')}</h3>
+            <div class="project-card-loc">${escapeHtml(p.location || '')}</div>
+            <div class="tag-badges">${tagBadges}</div>
+          </div>
+          <div class="project-card-actions">
+            <button class="btn btn-ghost btn-sm" data-action="toggle">${p.active ? "Verstecken" : "Anzeigen"}</button>
+            <button class="btn btn-ghost btn-sm" data-action="edit">Bearbeiten</button>
+            <button class="btn btn-danger btn-sm" data-action="delete">Löschen</button>
+          </div>
+        </article>`;
+    }
+
+    // ---- Edit handlers ----
+    function startEditProject(id) {
+      const p = state.projects.find(p => p.id === id);
+      if (!p) return;
+      // Cancel any other open edit first
+      if (state.editingProjectId && state.editingProjectId !== id) {
+        cancelEditProject();
+      }
+      state.editingProjectId = id;
+      state.projEditTags[id] = new Set(p.tags || []);
+      state.projEditPhotos[id] = (p.photos || []).map(x => ({ ...x }));
+      renderProjectsFeed();
+    }
+
+    function cancelEditProject() {
+      const id = state.editingProjectId;
+      if (id) {
+        delete state.projEditTags[id];
+        delete state.projEditPhotos[id];
+      }
+      state.editingProjectId = null;
+      renderProjectsFeed();
+    }
+
+    async function saveEditProject(id) {
+      hideProjApiError();
+      const displayId = document.getElementById(`proj-edit-display-id-${id}`).value.trim();
+      const title = document.getElementById(`proj-edit-title-${id}`).value.trim();
+      const location = document.getElementById(`proj-edit-location-${id}`).value.trim();
+      const description = document.getElementById(`proj-edit-description-${id}`).value.trim();
+      const active = document.getElementById(`proj-edit-active-${id}`).checked;
+      const tags = Array.from(state.projEditTags[id] || []);
+      const photos = (state.projEditPhotos[id] || []).slice();
+
+      if (!displayId || !title || !location || tags.length === 0 || photos.length === 0) {
+        showProjApiError("Bitte alle Pflichtfelder ausfüllen (Nummer, Titel, Ort, mind. 1 Kategorie, mind. 1 Bild).");
+        return;
+      }
+
+      const payload = {
+        display_id: displayId,
+        title, location, description,
+        tags, photos,
+        cover_url: photos[0].url,
+        active,
+        updated_at: new Date().toISOString(),
+      };
+
+      try {
+        const updated = await apiUpdateProject(id, payload);
+        const idx = state.projects.findIndex(x => x.id === id);
+        if (idx >= 0) state.projects[idx] = updated;
+        state.editingProjectId = null;
+        delete state.projEditTags[id];
+        delete state.projEditPhotos[id];
+        renderProjectsFilters();
+        renderProjectsFeed();
+        showToast("Projekt gespeichert");
+      } catch (err) {
+        showProjApiError(err.message);
+      }
+    }
+
+    async function handleToggleProject(id) {
+      const p = state.projects.find(p => p.id === id);
+      if (!p) return;
+      try {
+        const updated = await apiUpdateProject(id, {
+          active: !p.active,
+          updated_at: new Date().toISOString(),
+        });
+        const idx = state.projects.findIndex(x => x.id === id);
+        if (idx >= 0) state.projects[idx] = updated;
+        renderProjectsFilters();
+        renderProjectsFeed();
+        showToast(updated.active ? "Wieder sichtbar" : "Versteckt");
+      } catch (err) {
+        showProjApiError(err.message);
+      }
+    }
+
+    async function handleDeleteProject(id) {
+      const p = state.projects.find(p => p.id === id);
+      if (!p) return;
+      if (!confirm(`Projekt "${p.title}" wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden.`)) return;
+      try {
+        await apiDeleteProject(id);
+        // Best-effort storage cleanup (only objects from our bucket)
+        (p.photos || []).forEach(ph => {
+          if (ph.url) apiDeleteProjectImage(ph.url);
+          if (ph.thumb_url && ph.thumb_url !== ph.url) apiDeleteProjectImage(ph.thumb_url);
+        });
+        state.projects = state.projects.filter(x => x.id !== id);
+        renderProjectsFilters();
+        renderProjectsFeed();
+        showToast("Projekt gelöscht");
+      } catch (err) {
+        showProjApiError(err.message);
+      }
+    }
+
+    // ---- Wire up Projekte tab UI on page load ----
+    function bindProjectsUi() {
+      // Tab buttons
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+
+      // Composer fields → live state update
+      ["projNewDisplayId", "projNewTitle", "projNewLocation", "projNewDescription"].forEach(id => {
+        document.getElementById(id).addEventListener("input", updateProjectComposerState);
+      });
+      // Tag pills
+      bindTagPills(
+        document.getElementById("projNewTags"),
+        state.projComposer.tags,
+        updateProjectComposerState
+      );
+      // Multi-image upload for composer
+      wireMultiImageUpload({
+        dropZoneId: "projNewDropZone",
+        inputId: "projNewImageInput",
+        progressId: "projNewImageProgress",
+        progressTextId: "projNewImageProgressText",
+        gridId: "projNewPhotosGrid",
+        hintId: "projNewPhotosHint",
+        getPhotos: () => state.projComposer.photos,
+        setPhotos: (arr) => { state.projComposer.photos = arr; },
+        onChange: updateProjectComposerState,
+      });
+      document.getElementById("projPublishBtn").addEventListener("click", handlePublishProject);
+      document.getElementById("projApiErrorClose").addEventListener("click", hideProjApiError);
+
+      // Filter tabs
+      document.querySelectorAll("[data-proj-filter]").forEach(btn => {
+        btn.addEventListener("click", () => setProjectsFilter(btn.dataset.projFilter));
+      });
+
+      updateProjectComposerState();
+      renderProjectsFilters();
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Try restore session (auto-refreshes if access token expired)
+      state.session = await initSession();
+      renderAuth();
+
+      // Bind login form
+      document.getElementById("loginForm").addEventListener("submit", handleLogin);
+      document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+
+      // ---------- BANNER tab wiring ----------
+      const newText = document.getElementById("newText");
+      newText.addEventListener("input", () => {
+        updateComposerState();
+        updateComposerPreview();
+      });
+      ["newUntil", "newCtaLabel", "newCtaHref", "newActive"].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener("input", updateComposerPreview);
+        el.addEventListener("change", updateComposerPreview);
+      });
+      document.getElementById("publishBtn").addEventListener("click", handlePublish);
+      document.getElementById("apiErrorClose").addEventListener("click", hideApiError);
+
+      wireImageUpload({
+        dropZoneId: "newDropZone",
+        inputId: "newImageInput",
+        thumbId: "newImageThumb",
+        thumbImgId: "newImageThumbImg",
+        thumbNameId: "newImageThumbName",
+        thumbSizeId: "newImageThumbSize",
+        removeId: "newImageRemove",
+        progressId: "newImageProgress",
+        progressTextId: "newImageProgressText",
+        getValue: () => state.composerImageUrl,
+        setValue: (url) => { state.composerImageUrl = url; },
+        onChange: updateComposerPreview,
+        deleteOnRemove: true,
+      });
+
+      // Banner filter tabs (scoped to #feedFilters so we don't capture the
+      // project filter buttons, which share the .filter-tab class).
+      document.querySelectorAll("#feedFilters .filter-tab").forEach(btn => {
+        btn.addEventListener("click", () => setFilter(btn.dataset.filter));
+      });
+
+      updateComposerState();
+      updateComposerPreview();
+      renderFilters();
+
+      // ---------- PROJEKTE tab wiring ----------
+      bindProjectsUi();
+
+      // Apply persisted active tab (banner / projekte)
+      switchTab(state.activeTab);
+
+      // ---------- Initial data load ----------
+      // Banners: always loaded for the (default) active tab.
+      // Projects: only loaded when the Projekte tab is opened (lazy via switchTab).
+      if (state.session) {
+        await loadBanners();
+        // If the user previously left on the Projekte tab, fetch projects now.
+        if (state.activeTab === "projekte") {
+          await loadProjects();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
