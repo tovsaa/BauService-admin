@@ -368,11 +368,27 @@
       color: var(--text-muted);
       border-bottom: 2px solid transparent;
       transition: color 200ms ease, border-color 200ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     .tab-button:hover { color: var(--text); }
     .tab-button.active {
       color: var(--gold);
       border-bottom-color: var(--gold);
+    }
+    /* "dev" badge — signals a tab whose functionality is still in development.
+       Small inline pill next to the tab label. */
+    .tab-badge-dev {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      background: rgba(212, 165, 68, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(212, 165, 68, 0.3);
+      line-height: 1;
     }
 
     .tab-pane.hidden { display: none; }
@@ -1256,6 +1272,7 @@
       <nav class="tab-nav" id="adminTabs">
         <button class="tab-button active" data-tab="banner">
           <span>Banner</span>
+          <span class="tab-badge-dev">dev</span>
         </button>
         <button class="tab-button" data-tab="projekte">
           <span>Projekte</span>
